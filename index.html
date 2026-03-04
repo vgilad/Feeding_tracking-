@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מעקב אכילה עופרי</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:     #fdf6f0;
+  --card:   #ffffff;
+  --peach:  #f4a57a;
+  --rose:   #e8637a;
+  --mint:   #7bcfb8;
+  --text:   #2d2020;
+  --muted:  #9e8a82;
+  --border: #eed9cc;
+  --shadow: rgba(232,99,122,0.12);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  font-family: 'Heebo', sans-serif;
+  color: var(--text);
+  direction: rtl;
+}
+
+header {
+  background: linear-gradient(135deg, #f9e0d4 0%, #fce8d8 50%, #e8f7f2 100%);
+  padding: 22px 20px 16px;
+  text-align: center;
+  position: sticky; top: 0; z-index: 50;
+  border-bottom: 2px solid var(--border);
+}
+.app-name { font-size: clamp(1.4rem,5.5vw,2.2rem); font-weight: 900; color: var(--rose); letter-spacing: -0.02em; }
+.app-name span { color: var(--peach); }
+.app-sub { font-size: .75rem; color: var(--muted); margin-top: 3px; }
+
+main { max-width: 700px; margin: 0 auto; padding: 18px 12px 160px; }
+
+.session { display: none; }
+.session.active { display: block; }
+
+.session-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.session-title { font-size: 1rem; font-weight: 700; color: var(--rose); }
+.session-time { font-size: .72rem; color: var(--muted); direction: ltr; }
+
+.table-wrap {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px var(--shadow), 0 1px 4px rgba(0,0,0,.04);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+table { width: 100%; border-collapse: collapse; direction: rtl; }
+
+thead tr { background: linear-gradient(90deg, var(--rose) 0%, var(--peach) 100%); }
+thead th {
+  padding: 12px 8px; font-size: .72rem; font-weight: 700; color: #fff;
+  letter-spacing: .05em; text-align: center; white-space: nowrap;
+}
+thead th:first-child { text-align: right; padding-right: 14px; }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fff8f5; }
+tbody td { padding: 7px 5px; text-align: center; vertical-align: middle; }
+tbody td:first-child { text-align: right; padding-right: 12px; }
+
+input[type="time"], input[type="number"] {
+  font-family: 'Heebo', sans-serif; font-size: .85rem; font-weight: 500;
+  color: var(--text); background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 6px; width: 100%; text-align: center;
+  outline: none; transition: border-color .18s, box-shadow .18s;
+  -webkit-appearance: none; appearance: none;
+}
+input[type="time"]:focus, input[type="number"]:focus {
+  border-color: var(--peach); box-shadow: 0 0 0 3px rgba(244,165,122,.18);
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
+
+.col-time { width: 27%; } .col-nursing { width: 21%; }
+.col-pump { width: 21%; } .col-formula { width: 21%; } .col-del { width: 10%; }
+
+.del-btn {
+  background: none; border: none; cursor: pointer; color: #ddc0b8;
+  font-size: 1rem; padding: 4px 5px; border-radius: 6px;
+  transition: color .15s, background .15s; line-height: 1;
+}
+.del-btn:active, .del-btn:hover { color: var(--rose); background: #ffecea; }
+
+tfoot tr { background: linear-gradient(135deg, #fff0eb 0%, #eef9f6 100%); }
+tfoot td {
+  padding: 10px 6px; font-size: .88rem; font-weight: 700;
+  color: var(--rose); text-align: center; border-top: 2px solid var(--border);
+}
+tfoot td:first-child {
+  text-align: right; padding-right: 14px; font-size: .74rem;
+  font-weight: 600; color: var(--muted);
+}
+tfoot.hidden { display: none; }
+
+.grand-total {
+  display: none;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%);
+  border-radius: 14px; padding: 14px 18px; margin-bottom: 14px;
+  color: #fff; font-size: .85rem; font-weight: 500;
+  box-shadow: 0 4px 16px rgba(232,99,122,.28);
+}
+.grand-total.visible { display: block; }
+.grand-total strong { font-size: 1.4rem; font-weight: 900; display: block; margin-top: 3px; }
+
+.empty-hint { text-align: center; padding: 24px 16px; color: var(--muted); font-size: .8rem; line-height: 2; }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.action-btn {
+  font-family: 'Heebo', sans-serif; font-size: .8rem; font-weight: 700;
+  letter-spacing: .04em; padding: 12px 14px; border: none; border-radius: 12px;
+  cursor: pointer; transition: transform .12s, filter .12s; flex: 1;
+  min-width: 90px; white-space: nowrap; -webkit-user-select: none;
+}
+.action-btn:active { transform: scale(.95); filter: brightness(.93); }
+.btn-add  { background: linear-gradient(135deg, var(--mint) 0%, #5bbea6 100%); color: #fff; box-shadow: 0 3px 10px rgba(123,207,184,.4); }
+.btn-sum  { background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%); color: #fff; box-shadow: 0 3px 10px rgba(232,99,122,.35); }
+.btn-new  { background: linear-gradient(135deg, #b09fd8 0%, #8f7bbf 100%); color: #fff; box-shadow: 0 3px 10px rgba(176,159,216,.4); }
+.btn-clear { background: var(--card); color: var(--muted); border: 1.5px solid var(--border); flex: 0 0 auto; min-width: auto; padding: 12px 14px; }
+
+/* ── BOTTOM NAV ── */
+#bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, rgba(253,246,240,0) 0%, var(--bg) 28%);
+  padding: 10px 12px 18px; z-index: 100;
+}
+.nav-inner {
+  max-width: 700px; margin: 0 auto;
+  display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; padding-bottom: 2px; scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  flex-shrink: 0; width: 44px; height: 44px;
+  border-radius: 11px; border: 2px solid var(--border);
+  background: var(--card); color: var(--muted);
+  font-family: 'Heebo', sans-serif; font-size: .88rem; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07); -webkit-user-select: none;
+}
+.nav-tab:active { transform: scale(.91); }
+.nav-tab.active {
+  background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 4px 14px rgba(232,99,122,.42);
+  transform: translateY(-4px);
+}
+
+@media (max-width: 380px) {
+  thead th { font-size: .64rem; padding: 10px 4px; }
+  input[type="time"], input[type="number"] { font-size: .78rem; padding: 5px 3px; }
+  .action-btn { font-size: .73rem; padding: 11px 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="app-name">מעקב אכילה <span>עופרי</span> 🍼</div>
+  <div class="app-sub">רישום יומי · הנקה · שאיבה · מטרנה</div>
+</header>
+
+<main id="main-area"></main>
+
+<div id="bottom-nav">
+  <div class="nav-inner" id="nav-tabs"></div>
+</div>
+
+<script>
+'use strict';
+
+let sessions    = [];
+let activeIdx   = 0;
+let globalRowId = 0;
+
+function nowTime() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function nowLabel() {
+  const d = new Date();
+  return d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'}) + '  ' +
+         String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+// ── BUILD SESSION DOM ────────────────────────────────────────────
+function createSession() {
+  const num = sessions.length + 1;
+  const sid = 'sess-' + num;
+
+  const div = document.createElement('div');
+  div.className = 'session';
+  div.id = sid;
+  div.innerHTML =
+    '<div class="session-header">' +
+      '<div class="session-title">מדידה ' + num + '</div>' +
+      '<div class="session-time">' + nowLabel() + '</div>' +
+    '</div>' +
+    '<div class="table-wrap">' +
+      '<table>' +
+        '<thead><tr>' +
+          '<th class="col-time">שעה</th>' +
+          '<th class="col-nursing">הנקה<br><small style="font-weight:400;opacity:.85">דק\u05f3</small></th>' +
+          '<th class="col-pump">מ\u05f4ל שאוב</th>' +
+          '<th class="col-formula">מ\u05f4ל מטרנה</th>' +
+          '<th class="col-del"></th>' +
+        '</tr></thead>' +
+        '<tbody class="s-tbody"></tbody>' +
+        '<tfoot class="s-tfoot hidden"><tr>' +
+          '<td>סכום</td>' +
+          '<td class="s-sum-nursing">\u2014</td>' +
+          '<td class="s-sum-pump">\u2014</td>' +
+          '<td class="s-sum-formula">\u2014</td>' +
+          '<td></td>' +
+        '</tr></tfoot>' +
+      '</table>' +
+      '<div class="empty-hint s-empty">לחצי על ״הוסף שורה״ 🌸</div>' +
+    '</div>' +
+    '<div class="grand-total s-grand">סה\u05f4כ כולל<strong class="s-grand-val">\u2014</strong></div>' +
+    '<div class="actions">' +
+      '<button class="action-btn btn-add"   data-action="add">+ הוסף שורה</button>' +
+      '<button class="action-btn btn-sum"   data-action="sum">סכום \u2211</button>' +
+      '<button class="action-btn btn-new"   data-action="new">מדידה חדשה</button>' +
+      '<button class="action-btn btn-clear" data-action="clear">🗑</button>' +
+    '</div>';
+
+  // Wire up action buttons (use index captured at creation time)
+  const idx = sessions.length;   // will be the index after push
+  div.querySelector('[data-action=add]').addEventListener('click',   () => addRow(idx));
+  div.querySelector('[data-action=sum]').addEventListener('click',   () => calcSum(idx));
+  div.querySelector('[data-action=new]').addEventListener('click',   () => newSession());
+  div.querySelector('[data-action=clear]').addEventListener('click', () => clearSession(idx));
+
+  document.getElementById('main-area').appendChild(div);
+
+  // Nav tab
+  const tab = document.createElement('button');
+  tab.className = 'nav-tab';
+  tab.textContent = num;
+  tab.addEventListener('click', () => switchTo(idx));
+  document.getElementById('nav-tabs').appendChild(tab);
+
+  const session = { num, sid, el: div, tab, rowCount: 0 };
+  sessions.push(session);
+  return session;
+}
+
+// ── SWITCH ───────────────────────────────────────────────────────
+function switchTo(idx) {
+  sessions.forEach(s => s.el.classList.remove('active'));
+  sessions.forEach(s => s.tab.classList.remove('active'));
+  sessions[idx].el.classList.add('active');
+  sessions[idx].tab.classList.add('active');
+  activeIdx = idx;
+  sessions[idx].tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── NEW SESSION ──────────────────────────────────────────────────
+function newSession() {
+  createSession();
+  const newIdx = sessions.length - 1;
+  switchTo(newIdx);
+  addRow(newIdx);
+}
+
+// ── ADD ROW ──────────────────────────────────────────────────────
+function addRow(sIdx) {
+  const session = sessions[sIdx];
+  if (!session) return;
+  globalRowId++;
+  const rid = 'r-' + globalRowId;
+
+  const tr = document.createElement('tr');
+  tr.id = rid;
+  tr.innerHTML =
+    '<td class="col-time"><input type="time" value="' + nowTime() + '"></td>' +
+    '<td class="col-nursing"><input type="number" min="0" max="999" placeholder="\u2014"></td>' +
+    '<td class="col-pump"><input type="number" min="0" max="999" placeholder="\u2014"></td>' +
+    '<td class="col-formula"><input type="number" min="0" max="999" placeholder="\u2014"></td>' +
+    '<td class="col-del"><button class="del-btn" data-rid="' + rid + '" data-sidx="' + sIdx + '">\u2715</button></td>';
+
+  tr.querySelector('.del-btn').addEventListener('click', function() {
+    deleteRow(this.dataset.rid, parseInt(this.dataset.sidx));
+  });
+
+  session.el.querySelector('.s-tbody').appendChild(tr);
+  session.rowCount++;
+  syncEmpty(sIdx);
+  hideTotals(sIdx);
+  tr.querySelector('input[type=time]').focus();
+}
+
+// ── DELETE ROW ───────────────────────────────────────────────────
+function deleteRow(rid, sIdx) {
+  const tr = document.getElementById(rid);
+  if (!tr) return;
+  tr.style.transition = 'opacity .18s, transform .18s';
+  tr.style.opacity = '0';
+  tr.style.transform = 'translateX(16px)';
+  setTimeout(() => {
+    tr.remove();
+    sessions[sIdx].rowCount--;
+    syncEmpty(sIdx);
+    hideTotals(sIdx);
+  }, 180);
+}
+
+// ── CLEAR ────────────────────────────────────────────────────────
+function clearSession(sIdx) {
+  if (!confirm('למחוק את כל הנתונים של מדידה ' + (sIdx+1) + '?')) return;
+  sessions[sIdx].el.querySelector('.s-tbody').innerHTML = '';
+  sessions[sIdx].rowCount = 0;
+  hideTotals(sIdx);
+  syncEmpty(sIdx);
+}
+
+// ── SYNC EMPTY ───────────────────────────────────────────────────
+function syncEmpty(sIdx) {
+  const s = sessions[sIdx];
+  const rows = s.el.querySelectorAll('.s-tbody tr');
+  s.el.querySelector('.s-empty').style.display = rows.length ? 'none' : 'block';
+}
+
+// ── HIDE TOTALS ──────────────────────────────────────────────────
+function hideTotals(sIdx) {
+  const s = sessions[sIdx];
+  s.el.querySelector('.s-tfoot').classList.add('hidden');
+  s.el.querySelector('.s-grand').classList.remove('visible');
+}
+
+// ── CALC SUM ─────────────────────────────────────────────────────
+function calcSum(sIdx) {
+  const s = sessions[sIdx];
+  const rows = s.el.querySelectorAll('.s-tbody tr');
+  if (!rows.length) return;
+
+  function colSum(ci) {
+    let total = 0, has = false;
+    rows.forEach(tr => {
+      const inp = tr.querySelectorAll('input')[ci];
+      const v   = parseFloat(inp ? inp.value : '');
+      if (!isNaN(v) && v > 0) { total += v; has = true; }
+    });
+    return { total, has };
+  }
+
+  const nursing = colSum(1);
+  const pump    = colSum(2);
+  const formula = colSum(3);
+
+  s.el.querySelector('.s-sum-nursing').textContent = nursing.has ? nursing.total + ' \u05d3\u05e7\u05f3' : '\u2014';
+  s.el.querySelector('.s-sum-pump').textContent    = pump.has    ? pump.total    + ' \u05de\u05f4\u05dc'  : '\u2014';
+  s.el.querySelector('.s-sum-formula').textContent = formula.has ? formula.total + ' \u05de\u05f4\u05dc'  : '\u2014';
+  s.el.querySelector('.s-tfoot').classList.remove('hidden');
+
+  const mlTotal = (pump.has ? pump.total : 0) + (formula.has ? formula.total : 0);
+  const grandEl  = s.el.querySelector('.s-grand');
+  const grandVal = s.el.querySelector('.s-grand-val');
+  const parts = [];
+  if (mlTotal > 0)  parts.push(mlTotal + ' \u05de\u05f4\u05dc \u05e1\u05d4\u05f4\u05db');
+  if (nursing.has)  parts.push(nursing.total + ' \u05d3\u05e7\u05f3 \u05d4\u05e0\u05e7\u05d4');
+
+  if (parts.length) {
+    grandEl.classList.add('visible');
+    grandVal.textContent = parts.join(' \u00b7 ');
+  } else {
+    grandEl.classList.remove('visible');
+  }
+
+  s.el.querySelector('.s-tfoot').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+createSession();
+switchTo(0);
+addRow(0);
+</script>
+</body>
+</html>

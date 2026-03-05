@@ -8,255 +8,197 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="עופרי">
-<title>מעקב אכילה עופרי</title>
-
-<!-- PWA manifest inline via JS (no server needed) -->
+<title>מעקב אכילה ושינה עופרי</title>
 <script>
 const manifestData = {
-  name: "מעקב אכילה עופרי",
+  name: "מעקב עופרי",
   short_name: "עופרי 🍼",
-  description: "מעקב הנקה, שאיבה ומטרנה",
+  description: "מעקב הנקה, שאיבה, מטרנה ושינה",
   start_url: ".",
   display: "standalone",
   background_color: "#fdf6f0",
   theme_color: "#e8637a",
-  dir: "rtl",
-  lang: "he",
+  dir: "rtl", lang: "he",
   icons: [
     { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23e8637a'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='100'%3E%F0%9F%8D%BC%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
     { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23e8637a'/%3E%3Ctext x='256' y='340' text-anchor='middle' font-size='280'%3E%F0%9F%8D%BC%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-document.write('<link rel="manifest" href="' + manifestURL + '">');
+document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
 </script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --bg:     #fdf6f0;
-  --card:   #ffffff;
-  --peach:  #f4a57a;
-  --rose:   #e8637a;
-  --mint:   #7bcfb8;
-  --text:   #2d2020;
-  --muted:  #9e8a82;
-  --border: #eed9cc;
-  --shadow: rgba(232,99,122,0.12);
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fdf6f0;--card:#fff;
+  --peach:#f4a57a;--rose:#e8637a;
+  --mint:#7bcfb8;--blue:#6ab4e8;--indigo:#7b8fd8;
+  --text:#2d2020;--muted:#9e8a82;--border:#eed9cc;
+  --shadow:rgba(232,99,122,0.12);
+  --sleep-rose:#7b8fd8;--sleep-peach:#a78bdb;
 }
+html,body{width:100%;height:100%;background:var(--bg);font-family:'Heebo',sans-serif;color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased}
+body{padding-bottom:env(safe-area-inset-bottom)}
 
-html, body {
-  width: 100%; height: 100%;
-  background: var(--bg);
-  font-family: 'Heebo', sans-serif;
-  color: var(--text);
-  direction: rtl;
-  -webkit-font-smoothing: antialiased;
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,#f9e0d4 0%,#fce8d8 50%,#e8f7f2 100%);padding:20px 20px 14px;text-align:center;position:sticky;top:0;z-index:50;border-bottom:2px solid var(--border)}
+.app-name{font-size:clamp(1.3rem,5vw,2rem);font-weight:900;color:var(--rose);letter-spacing:-.02em}
+.app-name span{color:var(--peach)}
+.app-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+
+/* ── INSTALL BANNER ── */
+#install-banner{background:linear-gradient(135deg,#b09fd8,#8f7bbf);color:#fff;padding:9px 16px;font-size:.75rem;font-weight:600;gap:8px;align-items:center;justify-content:center;display:none;flex-wrap:wrap}
+#install-banner.show{display:flex}
+#install-banner button{background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);color:#fff;font-family:'Heebo',sans-serif;font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer}
+#install-banner .close-x{background:none;border:none;color:rgba(255,255,255,.7);font-size:1rem;padding:0 4px;cursor:pointer;margin-right:auto}
+
+/* ── MAIN VIEW SWITCHER ── */
+.main-view{display:none}
+.main-view.active{display:block}
+
+main{max-width:700px;margin:0 auto;padding:16px 12px 180px}
+
+/* ── SESSION ── */
+.session{display:none;animation:fadeIn .18s ease}
+.session.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.session-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.session-title{font-size:.95rem;font-weight:700;color:var(--rose)}
+.session-title.sleep{color:var(--sleep-rose)}
+.session-time{font-size:.68rem;color:var(--muted);direction:ltr}
+
+/* ── TABLE WRAP ── */
+.table-wrap{background:var(--card);border-radius:16px;box-shadow:0 4px 24px var(--shadow),0 1px 4px rgba(0,0,0,.04);overflow:hidden;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;direction:rtl}
+thead tr{background:linear-gradient(90deg,var(--rose) 0%,var(--peach) 100%)}
+thead tr.sleep-head{background:linear-gradient(90deg,var(--sleep-rose) 0%,var(--sleep-peach) 100%)}
+thead th{padding:11px 6px;font-size:.7rem;font-weight:700;color:#fff;letter-spacing:.04em;text-align:center;white-space:nowrap}
+thead th:first-child{text-align:right;padding-right:12px}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:6px 4px;text-align:center;vertical-align:middle}
+tbody td:first-child{text-align:right;padding-right:10px}
+
+input[type="time"],input[type="number"]{
+  font-family:'Heebo',sans-serif;font-size:.82rem;font-weight:500;
+  color:var(--text);background:var(--bg);border:1.5px solid var(--border);
+  border-radius:8px;padding:5px 4px;width:100%;text-align:center;
+  outline:none;transition:border-color .18s,box-shadow .18s;
+  -webkit-appearance:none;appearance:none
 }
+input[type="time"]:focus,input[type="number"]:focus{border-color:var(--peach);box-shadow:0 0 0 3px rgba(244,165,122,.18)}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type="number"]{-moz-appearance:textfield}
+.sleep-input:focus{border-color:var(--sleep-rose)!important;box-shadow:0 0 0 3px rgba(123,143,216,.18)!important}
 
-/* safe area for notch phones */
-body { padding-bottom: env(safe-area-inset-bottom); }
+/* duration display cell */
+.dur-cell{font-size:.82rem;font-weight:700;color:var(--sleep-rose);background:rgba(123,143,216,.07);border-radius:6px;padding:5px 4px;min-width:52px}
+.dur-cell.empty{color:#ccc;font-weight:400}
 
-header {
-  background: linear-gradient(135deg, #f9e0d4 0%, #fce8d8 50%, #e8f7f2 100%);
-  padding: 22px 20px 14px;
-  text-align: center;
-  position: sticky; top: 0; z-index: 50;
-  border-bottom: 2px solid var(--border);
-}
-.app-name { font-size: clamp(1.4rem,5.5vw,2.2rem); font-weight: 900; color: var(--rose); letter-spacing: -0.02em; }
-.app-name span { color: var(--peach); }
-.app-sub { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.del-btn{background:none;border:none;cursor:pointer;color:#ddc0b8;font-size:.95rem;padding:3px 5px;border-radius:6px;transition:color .15s,background .15s;line-height:1}
+.del-btn:active{color:var(--rose);background:#ffecea}
 
-/* install banner */
-#install-banner {
-  background: linear-gradient(135deg, #b09fd8, #8f7bbf);
-  color: #fff;
-  padding: 10px 16px;
-  font-size: .78rem;
-  font-weight: 600;
-  text-align: center;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  display: none;
-}
-#install-banner.show { display: flex; }
-#install-banner button {
-  background: rgba(255,255,255,.25); border: 1px solid rgba(255,255,255,.5);
-  color: #fff; font-family: 'Heebo',sans-serif; font-size: .72rem; font-weight: 700;
-  padding: 5px 12px; border-radius: 20px; cursor: pointer;
-}
-#install-banner .close-banner {
-  background: none; border: none; color: rgba(255,255,255,.7);
-  font-size: 1rem; padding: 0 4px; cursor: pointer; margin-right: auto;
-}
+tfoot tr{background:linear-gradient(135deg,#fff0eb 0%,#eef9f6 100%)}
+tfoot tr.sleep-foot{background:linear-gradient(135deg,#f0eeff 0%,#eef9f6 100%)}
+tfoot td{padding:9px 5px;font-size:.85rem;font-weight:700;color:var(--rose);text-align:center;border-top:2px solid var(--border)}
+tfoot td.sleep-sum{color:var(--sleep-rose)}
+tfoot td:first-child{text-align:right;padding-right:12px;font-size:.72rem;font-weight:600;color:var(--muted)}
+tfoot.hidden{display:none}
 
-main { max-width: 700px; margin: 0 auto; padding: 18px 12px 160px; }
+.grand-total{display:none;background:linear-gradient(135deg,var(--rose) 0%,var(--peach) 100%);border-radius:14px;padding:12px 16px;margin-bottom:12px;color:#fff;font-size:.82rem;font-weight:500;box-shadow:0 4px 16px rgba(232,99,122,.28)}
+.grand-total.sleep{background:linear-gradient(135deg,var(--sleep-rose) 0%,var(--sleep-peach) 100%);box-shadow:0 4px 16px rgba(123,143,216,.3)}
+.grand-total.visible{display:block}
+.grand-total strong{font-size:1.3rem;font-weight:900;display:block;margin-top:2px}
 
-.session { display: none; animation: fadeIn .2s ease; }
-.session.active { display: block; }
-@keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+.empty-hint{text-align:center;padding:22px 16px;color:var(--muted);font-size:.78rem;line-height:2}
 
-.session-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.session-title { font-size: 1rem; font-weight: 700; color: var(--rose); }
-.session-time { font-size: .7rem; color: var(--muted); direction: ltr; }
-
-.table-wrap {
-  background: var(--card);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px var(--shadow), 0 1px 4px rgba(0,0,0,.04);
-  overflow: hidden;
-  margin-bottom: 14px;
-}
-
-table { width: 100%; border-collapse: collapse; direction: rtl; }
-thead tr { background: linear-gradient(90deg, var(--rose) 0%, var(--peach) 100%); }
-thead th {
-  padding: 12px 8px; font-size: .72rem; font-weight: 700; color: #fff;
-  letter-spacing: .05em; text-align: center; white-space: nowrap;
-}
-thead th:first-child { text-align: right; padding-right: 14px; }
-
-tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
-tbody tr:last-child { border-bottom: none; }
-tbody td { padding: 7px 5px; text-align: center; vertical-align: middle; }
-tbody td:first-child { text-align: right; padding-right: 12px; }
-
-input[type="time"], input[type="number"] {
-  font-family: 'Heebo', sans-serif; font-size: .85rem; font-weight: 500;
-  color: var(--text); background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 6px 5px; width: 100%; text-align: center;
-  outline: none; transition: border-color .18s, box-shadow .18s;
-  -webkit-appearance: none; appearance: none;
-}
-input[type="time"]:focus, input[type="number"]:focus {
-  border-color: var(--peach); box-shadow: 0 0 0 3px rgba(244,165,122,.18);
-}
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
-input[type="number"] { -moz-appearance: textfield; }
-
-.col-time { width: 27%; } .col-nursing { width: 21%; }
-.col-pump { width: 21%; } .col-formula { width: 21%; } .col-del { width: 10%; }
-
-.del-btn {
-  background: none; border: none; cursor: pointer; color: #ddc0b8;
-  font-size: 1rem; padding: 4px 5px; border-radius: 6px;
-  transition: color .15s, background .15s; line-height: 1;
-}
-.del-btn:active { color: var(--rose); background: #ffecea; }
-
-tfoot tr { background: linear-gradient(135deg, #fff0eb 0%, #eef9f6 100%); }
-tfoot td {
-  padding: 10px 6px; font-size: .88rem; font-weight: 700;
-  color: var(--rose); text-align: center; border-top: 2px solid var(--border);
-}
-tfoot td:first-child {
-  text-align: right; padding-right: 14px;
-  font-size: .74rem; font-weight: 600; color: var(--muted);
-}
-tfoot.hidden { display: none; }
-
-.grand-total {
-  display: none;
-  background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%);
-  border-radius: 14px; padding: 14px 18px; margin-bottom: 14px;
-  color: #fff; font-size: .85rem; font-weight: 500;
-  box-shadow: 0 4px 16px rgba(232,99,122,.28);
-}
-.grand-total.visible { display: block; }
-.grand-total strong { font-size: 1.4rem; font-weight: 900; display: block; margin-top: 3px; }
-
-.empty-hint { text-align: center; padding: 24px 16px; color: var(--muted); font-size: .8rem; line-height: 2; }
-
-.actions { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
-.actions::-webkit-scrollbar { display: none; }
-.action-btn {
-  font-family: 'Heebo', sans-serif; font-size: .79rem; font-weight: 700;
-  letter-spacing: .03em; padding: 12px 12px; border: none; border-radius: 12px;
-  cursor: pointer; transition: transform .12s, filter .12s;
-  flex: 0 0 auto; white-space: nowrap; -webkit-user-select: none;
-}
-.action-btn:active { transform: scale(.95); filter: brightness(.93); }
-.btn-add   { background: linear-gradient(135deg, var(--mint) 0%, #5bbea6 100%); color: #fff; box-shadow: 0 3px 10px rgba(123,207,184,.4); }
-.btn-sum   { background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%); color: #fff; box-shadow: 0 3px 10px rgba(232,99,122,.35); }
-.btn-new   { background: linear-gradient(135deg, #b09fd8 0%, #8f7bbf 100%); color: #fff; box-shadow: 0 3px 10px rgba(176,159,216,.4); }
-.btn-clear { background: var(--card); color: var(--muted); border: 1.5px solid var(--border); flex: 0 0 auto; min-width: auto; padding: 12px 12px; }
+/* ── ACTION BUTTONS ── */
+.actions{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+.actions::-webkit-scrollbar{display:none}
+.action-btn{font-family:'Heebo',sans-serif;font-size:.77rem;font-weight:700;letter-spacing:.03em;padding:11px 12px;border:none;border-radius:12px;cursor:pointer;transition:transform .12s,filter .12s;flex:0 0 auto;white-space:nowrap;-webkit-user-select:none}
+.action-btn:active{transform:scale(.95);filter:brightness(.93)}
+.btn-add  {background:linear-gradient(135deg,var(--mint) 0%,#5bbea6 100%);color:#fff;box-shadow:0 3px 10px rgba(123,207,184,.4)}
+.btn-sum  {background:linear-gradient(135deg,var(--rose) 0%,var(--peach) 100%);color:#fff;box-shadow:0 3px 10px rgba(232,99,122,.35)}
+.btn-sum.sleep{background:linear-gradient(135deg,var(--sleep-rose) 0%,var(--sleep-peach) 100%);box-shadow:0 3px 10px rgba(123,143,216,.35)}
+.btn-new  {background:linear-gradient(135deg,#b09fd8 0%,#8f7bbf 100%);color:#fff;box-shadow:0 3px 10px rgba(176,159,216,.4)}
+.btn-clear{background:var(--card);color:var(--muted);border:1.5px solid var(--border)}
 
 /* ── BOTTOM NAV ── */
-#bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(180deg, rgba(253,246,240,0) 0%, var(--bg) 30%);
-  padding: 10px 12px calc(14px + env(safe-area-inset-bottom)); z-index: 100;
-}
-.nav-inner {
-  max-width: 700px; margin: 0 auto;
-  display: flex; align-items: center; gap: 8px;
-  overflow-x: auto; padding-bottom: 2px; scrollbar-width: none;
-}
-.nav-inner::-webkit-scrollbar { display: none; }
-.nav-tab {
-  flex-shrink: 0; width: 44px; height: 44px;
-  border-radius: 11px; border: 2px solid var(--border);
-  background: var(--card); color: var(--muted);
-  font-family: 'Heebo', sans-serif; font-size: .88rem; font-weight: 700;
-  cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,.07); -webkit-user-select: none;
-}
-.nav-tab:active { transform: scale(.91); }
-.nav-tab.active {
-  background: linear-gradient(135deg, var(--rose) 0%, var(--peach) 100%);
-  border-color: transparent; color: #fff;
-  box-shadow: 0 4px 14px rgba(232,99,122,.42);
-  transform: translateY(-4px);
-}
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,rgba(253,246,240,0) 0%,var(--bg) 28%);padding:8px 12px calc(14px + env(safe-area-inset-bottom));z-index:100}
+.bottom-nav-inner{max-width:700px;margin:0 auto}
+
+/* view toggle tabs */
+.view-tabs{display:flex;gap:8px;margin-bottom:8px}
+.view-tab{flex:1;font-family:'Heebo',sans-serif;font-size:.8rem;font-weight:700;padding:10px 8px;border-radius:12px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;-webkit-user-select:none;text-align:center}
+.view-tab:active{transform:scale(.96)}
+.view-tab.active.feed{background:linear-gradient(135deg,var(--rose),var(--peach));border-color:transparent;color:#fff;box-shadow:0 3px 12px rgba(232,99,122,.38)}
+.view-tab.active.sleep{background:linear-gradient(135deg,var(--sleep-rose),var(--sleep-peach));border-color:transparent;color:#fff;box-shadow:0 3px 12px rgba(123,143,216,.38)}
+
+/* session tabs row */
+.session-tabs-row{display:flex;gap:7px;align-items:center;margin-bottom:4px}
+.nav-tabs-wrap{display:flex;gap:7px;overflow-x:auto;flex:1;scrollbar-width:none;padding-bottom:1px}
+.nav-tabs-wrap::-webkit-scrollbar{display:none}
+.nav-tab{flex-shrink:0;width:40px;height:40px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--muted);font-family:'Heebo',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.06);-webkit-user-select:none}
+.nav-tab:active{transform:scale(.91)}
+.nav-tab.active.feed{background:linear-gradient(135deg,var(--rose),var(--peach));border-color:transparent;color:#fff;box-shadow:0 3px 12px rgba(232,99,122,.4);transform:translateY(-3px)}
+.nav-tab.active.sleep{background:linear-gradient(135deg,var(--sleep-rose),var(--sleep-peach));border-color:transparent;color:#fff;box-shadow:0 3px 12px rgba(123,143,216,.4);transform:translateY(-3px)}
+
+#delete-all-btn{display:block;width:100%;font-family:'Heebo',sans-serif;font-size:.7rem;font-weight:600;padding:7px 16px;background:transparent;border:1.5px solid #ddc0b8;border-radius:9px;color:#c0897a;cursor:pointer;-webkit-user-select:none;transition:background .15s,color .15s;text-align:center;margin-top:7px;margin-bottom:7px}
+#delete-all-btn:active{background:#ffecea;color:var(--rose);border-color:var(--rose)}
 
 /* saved toast */
-#saved-toast {
-  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-  background: rgba(45,32,32,.82); color: #fff; border-radius: 24px;
-  padding: 8px 20px; font-size: .75rem; font-weight: 500;
-  opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; z-index: 200;
-  backdrop-filter: blur(6px); white-space: nowrap;
-}
-#saved-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#saved-toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(45,32,32,.82);color:#fff;border-radius:22px;padding:7px 18px;font-size:.73rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;z-index:200;backdrop-filter:blur(6px);white-space:nowrap}
+#saved-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-@media (max-width: 380px) {
-  thead th { font-size: .63rem; padding: 10px 4px; }
-  input[type="time"], input[type="number"] { font-size: .77rem; padding: 5px 3px; }
-  .action-btn { font-size: .72rem; padding: 11px 9px; }
+@media(max-width:380px){
+  thead th{font-size:.62rem;padding:10px 3px}
+  input[type="time"],input[type="number"]{font-size:.75rem;padding:5px 2px}
+  .action-btn{font-size:.7rem;padding:10px 9px}
+  .view-tab{font-size:.74rem;padding:9px 6px}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="app-name">מעקב אכילה <span>עופרי</span> 🍼</div>
-  <div class="app-sub">רישום יומי · הנקה · שאיבה · מטרנה</div>
+  <div class="app-name">מעקב <span>עופרי</span> 🍼🌙</div>
+  <div class="app-sub">האכלה · שינה · רישום יומי</div>
 </header>
 
-<div id="install-banner" class="show">
-  <div id="install-auto" style="display:none;width:100%;align-items:center;justify-content:center;gap:10px">
-    <span>התקיני כאפליקציה על המסך הבית 📱</span>
+<div id="install-banner">
+  <div id="install-auto" style="display:none;width:100%;align-items:center;justify-content:center;gap:8px">
+    <span>התקיני כאפליקציה 📱</span>
     <button id="install-btn">התקן</button>
-    <button class="close-banner" id="close-banner">✕</button>
+    <button class="close-x" id="close-banner">✕</button>
   </div>
-  <div id="install-manual" style="display:flex;width:100%;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
-    <span>📱 להתקנה: Chrome ← שלוש נקודות ← <strong>״הוסף למסך הבית״</strong></span>
-    <button class="close-banner" id="close-banner-manual">✕</button>
+  <div id="install-manual" style="display:flex;width:100%;align-items:center;justify-content:center;gap:8px">
+    <span>📱 Chrome ← שלוש נקודות ← <strong>הוסף למסך הבית</strong></span>
+    <button class="close-x" id="close-banner-manual">✕</button>
   </div>
 </div>
 
-<main id="main-area"></main>
+<!-- FEEDING VIEW -->
+<div class="main-view active" id="view-feed">
+  <main id="main-feed"></main>
+</div>
+
+<!-- SLEEP VIEW -->
+<div class="main-view" id="view-sleep">
+  <main id="main-sleep"></main>
+</div>
 
 <div id="bottom-nav">
-  <div class="nav-inner" id="nav-tabs"></div>
+  <div class="bottom-nav-inner">
+    <div class="session-tabs-row">
+      <div class="nav-tabs-wrap" id="nav-tabs"></div>
+    </div>
+    <button id="delete-all-btn" onclick="deleteAllSessions()">🗑 מחק את כל המדידות</button>
+    <div class="view-tabs">
+      <button class="view-tab feed active" id="tab-feed" onclick="switchView('feed')">🍼 מעקב האכלה</button>
+      <button class="view-tab sleep" id="tab-sleep" onclick="switchView('sleep')">🌙 מעקב שינה</button>
+    </div>
+  </div>
 </div>
 
 <div id="saved-toast">נשמר ✓</div>
@@ -265,377 +207,487 @@ tfoot.hidden { display: none; }
 'use strict';
 
 // ══════════════════════════════════════════════
-//  STORAGE  — saves everything to localStorage
+//  STATE
 // ══════════════════════════════════════════════
-const STORE_KEY = 'ofri_feeding_v2';
+const STORE_KEY = 'ofri_v3';
+let currentView = 'feed';   // 'feed' | 'sleep'
+let feedSessions  = [], sleepSessions  = [];
+let feedActive    = 0,    sleepActive   = 0;
+let globalRowId   = 0;
 
-function saveState() {
-  const data = sessions.map(s => ({
-    num:   s.num,
-    label: s.label,
-    rows:  getRowsData(s)
-  }));
-  localStorage.setItem(STORE_KEY, JSON.stringify({ sessions: data, activeIdx }));
-  flashSaved();
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch(e) { return null; }
-}
-
-function getRowsData(session) {
-  const rows = [];
-  session.el.querySelectorAll('.s-tbody tr').forEach(tr => {
-    const inp = tr.querySelectorAll('input');
-    rows.push({
-      time:    inp[0]?.value || '',
-      nursing: inp[1]?.value || '',
-      pump:    inp[2]?.value || '',
-      formula: inp[3]?.value || ''
-    });
-  });
-  return rows;
-}
-
-let saveTimer = null;
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveState, 600);
-}
-
-let toastTimer = null;
-function flashSaved() {
-  const el = document.getElementById('saved-toast');
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 1400);
-}
-
-// ══════════════════════════════════════════════
-//  APP STATE
-// ══════════════════════════════════════════════
-let sessions    = [];
-let activeIdx   = 0;
-let globalRowId = 0;
-
+// ── HELPERS ──────────────────────────────────
 function nowTime() {
   const d = new Date();
-  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  return pad(d.getHours()) + ':' + pad(d.getMinutes());
 }
 function nowLabel() {
   const d = new Date();
-  return d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'}) + '  ' +
-         String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  return d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'}) + '  ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function sessions()  { return currentView === 'feed' ? feedSessions  : sleepSessions;  }
+function activeIdx() { return currentView === 'feed' ? feedActive     : sleepActive;    }
+function setActive(i){ if(currentView==='feed') feedActive=i; else sleepActive=i; }
+function mainEl()    { return document.getElementById(currentView==='feed'?'main-feed':'main-sleep'); }
+
+// ══════════════════════════════════════════════
+//  VIEW SWITCH
+// ══════════════════════════════════════════════
+function switchView(view) {
+  currentView = view;
+  document.getElementById('view-feed').classList.toggle('active', view==='feed');
+  document.getElementById('view-sleep').classList.toggle('active', view==='sleep');
+  document.getElementById('tab-feed').classList.toggle('active', view==='feed');
+  document.getElementById('tab-sleep').classList.toggle('active', view==='sleep');
+  rebuildNavTabs();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // ══════════════════════════════════════════════
-//  BUILD SESSION
+//  NAV TABS (shared row, changes per view)
 // ══════════════════════════════════════════════
-function createSession(labelOverride) {
-  const num   = sessions.length + 1;
-  const sid   = 'sess-' + num;
-  const label = labelOverride || nowLabel();
+function rebuildNavTabs() {
+  const wrap = document.getElementById('nav-tabs');
+  wrap.innerHTML = '';
+  const list = sessions();
+  const ai   = activeIdx();
+  list.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab' + (i===ai?' active '+currentView:'');
+    btn.textContent = i + 1;
+    btn.addEventListener('click', () => switchSession(i));
+    wrap.appendChild(btn);
+    s.tab = btn;
+  });
+}
 
-  const div = document.createElement('div');
+function switchSession(idx) {
+  const list = sessions();
+  if (idx < 0 || idx >= list.length) return;
+  list.forEach(s => { s.el.classList.remove('active'); });
+  list[idx].el.classList.add('active');
+  setActive(idx);
+  rebuildNavTabs();
+  list[idx].tab?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════
+//  CREATE FEEDING SESSION
+// ══════════════════════════════════════════════
+function createFeedSession(labelOverride) {
+  const num   = feedSessions.length + 1;
+  const label = labelOverride || nowLabel();
+  const div   = document.createElement('div');
   div.className = 'session';
-  div.id = sid;
+  div.id = 'feed-sess-' + num;
 
   div.innerHTML =
     '<div class="session-header">' +
-      '<div class="session-title">מדידה ' + num + '</div>' +
+      '<div class="session-title">\u05de\u05d3\u05d9\u05d3\u05d4 ' + num + '</div>' +
       '<div class="session-time">' + label + '</div>' +
     '</div>' +
-    '<div class="table-wrap">' +
-      '<table>' +
-        '<thead><tr>' +
-          '<th class="col-time">שעה</th>' +
-          '<th class="col-nursing">הנקה<br><small style="font-weight:400;opacity:.85">דק\u05f3</small></th>' +
-          '<th class="col-pump">מ\u05f4ל שאוב</th>' +
-          '<th class="col-formula">מ\u05f4ל מטרנה</th>' +
-          '<th class="col-del"></th>' +
-        '</tr></thead>' +
-        '<tbody class="s-tbody"></tbody>' +
-        '<tfoot class="s-tfoot hidden"><tr>' +
-          '<td>סכום</td>' +
-          '<td class="s-sum-nursing">\u2014</td>' +
-          '<td class="s-sum-pump">\u2014</td>' +
-          '<td class="s-sum-formula">\u2014</td>' +
-          '<td></td>' +
-        '</tr></tfoot>' +
-      '</table>' +
-      '<div class="empty-hint s-empty">\u05dc\u05d7\u05e6\u05d9 \u05e2\u05dc \u05f4\u05d4\u05d5\u05e1\u05e3 \u05e9\u05d5\u05e8\u05d4\u05f4 \uD83C\uDF38</div>' +
+    '<div class="table-wrap"><table>' +
+      '<thead><tr>' +
+        '<th style="width:22%">\u05e9\u05e2\u05d4</th>' +
+        '<th style="width:17%">\u05d4\u05e0\u05e7\u05d4<br><small style="font-weight:400;opacity:.85">\u05d3\u05e7\u05f3</small></th>' +
+        '<th style="width:18%">\u05d6\u05de\u05df \u05d0\u05db\u05dc<br><small style="font-weight:400;opacity:.85">\u05d3\u05e7\u05f3</small></th>' +
+        '<th style="width:18%">\u05de\u05f4\u05dc \u05e9\u05d0\u05d5\u05d1</th>' +
+        '<th style="width:18%">\u05de\u05f4\u05dc \u05de\u05d8\u05e8\u05e0\u05d4</th>' +
+        '<th style="width:7%"></th>' +
+      '</tr></thead>' +
+      '<tbody class="s-tbody"></tbody>' +
+      '<tfoot class="s-tfoot hidden"><tr>' +
+        '<td>\u05e1\u05db\u05d5\u05dd</td>' +
+        '<td class="s-sum-nursing">\u2014</td>' +
+        '<td class="s-sum-eattime">\u2014</td>' +
+        '<td class="s-sum-pump">\u2014</td>' +
+        '<td class="s-sum-formula">\u2014</td>' +
+        '<td></td>' +
+      '</tr></tfoot>' +
+    '</table>' +
+    '<div class="empty-hint s-empty">\u05dc\u05d7\u05e6\u05d9 \u05e2\u05dc \u05f4\u05d4\u05d5\u05e1\u05e3 \u05e9\u05d5\u05e8\u05d4\u05f4 \uD83C\uDF38</div>' +
     '</div>' +
     '<div class="grand-total s-grand">\u05e1\u05d4\u05f4\u05db \u05db\u05d5\u05dc\u05dc<strong class="s-grand-val">\u2014</strong></div>' +
     '<div class="actions">' +
-      '<button class="action-btn btn-add"   data-action="add">+ \u05d4\u05d5\u05e1\u05e3 \u05e9\u05d5\u05e8\u05d4</button>' +
-      '<button class="action-btn btn-sum"   data-action="sum">\u05e1\u05db\u05d5\u05dd \u2211</button>' +
-      '<button class="action-btn btn-new"   data-action="new">\u05de\u05d3\u05d9\u05d3\u05d4 \u05d7\u05d3\u05e9\u05d4</button>' +
-      '<button class="action-btn btn-clear" data-action="clear">\uD83D\uDDD1</button>' +
+      '<button class="action-btn btn-add"   data-a="add">+ \u05d4\u05d5\u05e1\u05e3</button>' +
+      '<button class="action-btn btn-sum"   data-a="sum">\u05e1\u05db\u05d5\u05dd \u2211</button>' +
+      '<button class="action-btn btn-new"   data-a="new">\u05de\u05d3\u05d9\u05d3\u05d4 \u05d7\u05d3\u05e9\u05d4</button>' +
+      '<button class="action-btn btn-clear" data-a="clear">\uD83D\uDDD1</button>' +
     '</div>';
 
-  const idx = sessions.length;
-  div.querySelector('[data-action=add]').addEventListener('click',   () => addRow(idx));
-  div.querySelector('[data-action=sum]').addEventListener('click',   () => calcSum(idx));
-  div.querySelector('[data-action=new]').addEventListener('click',   () => newSession());
-  div.querySelector('[data-action=clear]').addEventListener('click', () => clearSession(idx));
+  const idx = feedSessions.length;
+  div.querySelector('[data-a=add]').addEventListener('click',   () => { currentView='feed'; addFeedRow(idx); });
+  div.querySelector('[data-a=sum]').addEventListener('click',   () => calcFeedSum(idx));
+  div.querySelector('[data-a=new]').addEventListener('click',   () => { currentView='feed'; newFeedSession(); });
+  div.querySelector('[data-a=clear]').addEventListener('click', () => { currentView='feed'; clearFeedSession(idx); });
 
-  document.getElementById('main-area').appendChild(div);
-
-  const tab = document.createElement('button');
-  tab.className = 'nav-tab';
-  tab.textContent = num;
-  tab.addEventListener('click', () => switchTo(idx));
-  document.getElementById('nav-tabs').appendChild(tab);
-
-  const session = { num, sid, label, el: div, tab, rowCount: 0 };
-  sessions.push(session);
-  return session;
+  document.getElementById('main-feed').appendChild(div);
+  const s = { num, label, el: div, tab: null, rowCount: 0 };
+  feedSessions.push(s);
+  return s;
 }
 
 // ══════════════════════════════════════════════
-//  NAVIGATION
+//  CREATE SLEEP SESSION
 // ══════════════════════════════════════════════
-function switchTo(idx) {
-  sessions.forEach(s => { s.el.classList.remove('active'); s.tab.classList.remove('active'); });
-  sessions[idx].el.classList.add('active');
-  sessions[idx].tab.classList.add('active');
-  activeIdx = idx;
-  sessions[idx].tab.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-  window.scrollTo({ top:0, behavior:'smooth' });
+function createSleepSession(labelOverride) {
+  const num   = sleepSessions.length + 1;
+  const label = labelOverride || nowLabel();
+  const div   = document.createElement('div');
+  div.className = 'session';
+  div.id = 'sleep-sess-' + num;
+
+  div.innerHTML =
+    '<div class="session-header">' +
+      '<div class="session-title sleep">\u05e9\u05d9\u05e0\u05d4 ' + num + '</div>' +
+      '<div class="session-time">' + label + '</div>' +
+    '</div>' +
+    '<div class="table-wrap"><table>' +
+      '<thead><tr class="sleep-head">' +
+        '<th style="width:30%">\u05ea\u05d7\u05d9\u05dc\u05ea \u05e9\u05d9\u05e0\u05d4</th>' +
+        '<th style="width:30%">\u05e1\u05d9\u05d5\u05dd \u05e9\u05d9\u05e0\u05d4</th>' +
+        '<th style="width:30%">\u05e1\u05d4\u05f4\u05db \u05d6\u05de\u05df</th>' +
+        '<th style="width:10%"></th>' +
+      '</tr></thead>' +
+      '<tbody class="s-tbody"></tbody>' +
+      '<tfoot class="s-tfoot hidden"><tr class="sleep-foot">' +
+        '<td>\u05e1\u05db\u05d5\u05dd</td>' +
+        '<td></td>' +
+        '<td class="s-sum-dur sleep-sum">\u2014</td>' +
+        '<td></td>' +
+      '</tr></tfoot>' +
+    '</table>' +
+    '<div class="empty-hint s-empty">\u05dc\u05d7\u05e6\u05d9 \u05e2\u05dc \u05f4\u05d4\u05d5\u05e1\u05e3 \u05e9\u05d5\u05e8\u05d4\u05f4 \uD83C\uDF19</div>' +
+    '</div>' +
+    '<div class="grand-total sleep s-grand">\u05e1\u05d4\u05f4\u05db \u05d6\u05de\u05df \u05e9\u05d9\u05e0\u05d4<strong class="s-grand-val">\u2014</strong></div>' +
+    '<div class="actions">' +
+      '<button class="action-btn btn-add"        data-a="add">+ \u05d4\u05d5\u05e1\u05e3</button>' +
+      '<button class="action-btn btn-sum sleep"  data-a="sum">\u05e1\u05db\u05d5\u05dd \u2211</button>' +
+      '<button class="action-btn btn-new"        data-a="new">\u05de\u05d3\u05d9\u05d3\u05d4 \u05d7\u05d3\u05e9\u05d4</button>' +
+      '<button class="action-btn btn-clear"      data-a="clear">\uD83D\uDDD1</button>' +
+    '</div>';
+
+  const idx = sleepSessions.length;
+  div.querySelector('[data-a=add]').addEventListener('click',   () => { currentView='sleep'; addSleepRow(idx); });
+  div.querySelector('[data-a=sum]').addEventListener('click',   () => calcSleepSum(idx));
+  div.querySelector('[data-a=new]').addEventListener('click',   () => { currentView='sleep'; newSleepSession(); });
+  div.querySelector('[data-a=clear]').addEventListener('click', () => { currentView='sleep'; clearSleepSession(idx); });
+
+  document.getElementById('main-sleep').appendChild(div);
+  const s = { num, label, el: div, tab: null, rowCount: 0 };
+  sleepSessions.push(s);
+  return s;
 }
 
 // ══════════════════════════════════════════════
-//  SESSION ACTIONS
+//  FEED ROWS
 // ══════════════════════════════════════════════
-function newSession() {
-  createSession();
-  const newIdx = sessions.length - 1;
-  switchTo(newIdx);
-  addRow(newIdx);
-  saveState();
-}
-
-function addRow(sIdx, data) {
-  const session = sessions[sIdx];
-  if (!session) return;
+function addFeedRow(sIdx, data) {
+  const s = feedSessions[sIdx];
+  if (!s) return;
   globalRowId++;
   const rid = 'r-' + globalRowId;
-
   const tr = document.createElement('tr');
   tr.id = rid;
-  const timeVal = data?.time || nowTime();
   tr.innerHTML =
-    '<td class="col-time"><input type="time" value="' + timeVal + '"></td>' +
-    '<td class="col-nursing"><input type="number" min="0" max="999" placeholder="\u2014" value="' + (data?.nursing||'') + '"></td>' +
-    '<td class="col-pump"><input type="number" min="0" max="999" placeholder="\u2014" value="' + (data?.pump||'') + '"></td>' +
-    '<td class="col-formula"><input type="number" min="0" max="999" placeholder="\u2014" value="' + (data?.formula||'') + '"></td>' +
-    '<td class="col-del"><button class="del-btn" data-rid="' + rid + '" data-sidx="' + sIdx + '">\u2715</button></td>';
-
-  tr.querySelector('.del-btn').addEventListener('click', function() {
-    deleteRow(this.dataset.rid, parseInt(this.dataset.sidx));
-  });
-
-  // Save on any input change
-  tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', scheduleSave));
-
-  session.el.querySelector('.s-tbody').appendChild(tr);
-  session.rowCount++;
-  syncEmpty(sIdx);
-  hideTotals(sIdx);
-  if (!data) tr.querySelector('input[type=time]').focus();
+    '<td><input type="time" value="'+(data?.time||nowTime())+'"></td>' +
+    '<td><input type="number" min="0" max="999" placeholder="\u2014" value="'+(data?.nursing||'')+'"></td>' +
+    '<td><input type="number" min="0" max="999" placeholder="\u2014" value="'+(data?.eattime||'')+'"></td>' +
+    '<td><input type="number" min="0" max="999" placeholder="\u2014" value="'+(data?.pump||'')+'"></td>' +
+    '<td><input type="number" min="0" max="999" placeholder="\u2014" value="'+(data?.formula||'')+'"></td>' +
+    '<td><button class="del-btn" data-rid="'+rid+'" data-sidx="'+sIdx+'">\u2715</button></td>';
+  tr.querySelector('.del-btn').addEventListener('click', function(){ deleteFeedRow(this.dataset.rid, +this.dataset.sidx); });
+  tr.querySelectorAll('input').forEach(i => i.addEventListener('input', scheduleSave));
+  s.el.querySelector('.s-tbody').appendChild(tr);
+  s.rowCount++;
+  syncEmpty(s);
+  hideTotals(s);
+  if (!data) tr.querySelector('input').focus();
 }
 
-function deleteRow(rid, sIdx) {
-  const tr = document.getElementById(rid);
-  if (!tr) return;
-  tr.style.transition = 'opacity .18s, transform .18s';
-  tr.style.opacity = '0';
-  tr.style.transform = 'translateX(16px)';
-  setTimeout(() => {
-    tr.remove();
-    sessions[sIdx].rowCount--;
-    syncEmpty(sIdx);
-    hideTotals(sIdx);
-    saveState();
-  }, 180);
+function deleteFeedRow(rid, sIdx) {
+  const tr = document.getElementById(rid); if (!tr) return;
+  tr.style.transition='opacity .17s,transform .17s'; tr.style.opacity='0'; tr.style.transform='translateX(14px)';
+  setTimeout(() => { tr.remove(); feedSessions[sIdx].rowCount--; syncEmpty(feedSessions[sIdx]); hideTotals(feedSessions[sIdx]); scheduleSave(); }, 170);
 }
 
-function clearSession(sIdx) {
-  if (!confirm('\u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05db\u05dc \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e9\u05dc \u05de\u05d3\u05d9\u05d3\u05d4 ' + (sIdx+1) + '?')) return;
-  sessions[sIdx].el.querySelector('.s-tbody').innerHTML = '';
-  sessions[sIdx].rowCount = 0;
-  hideTotals(sIdx);
-  syncEmpty(sIdx);
+function newFeedSession() {
+  createFeedSession();
+  const idx = feedSessions.length - 1;
+  feedActive = idx;
+  feedSessions.forEach(s => s.el.classList.remove('active'));
+  feedSessions[idx].el.classList.add('active');
+  rebuildNavTabs();
+  addFeedRow(idx);
   saveState();
 }
 
-function syncEmpty(sIdx) {
-  const s = sessions[sIdx];
-  const rows = s.el.querySelectorAll('.s-tbody tr');
-  s.el.querySelector('.s-empty').style.display = rows.length ? 'none' : 'block';
+function clearFeedSession(sIdx) {
+  if (!confirm('\u05dc\u05de\u05d7\u05d5\u05e7 \u05de\u05d3\u05d9\u05d3\u05d4 ' + (sIdx+1) + '?')) return;
+  feedSessions[sIdx].el.querySelector('.s-tbody').innerHTML = '';
+  feedSessions[sIdx].rowCount = 0;
+  hideTotals(feedSessions[sIdx]); syncEmpty(feedSessions[sIdx]); saveState();
 }
 
-function hideTotals(sIdx) {
-  const s = sessions[sIdx];
+function calcFeedSum(sIdx) {
+  const s = feedSessions[sIdx];
+  const rows = s.el.querySelectorAll('.s-tbody tr');
+  if (!rows.length) return;
+  function cs(ci) {
+    let t=0,h=false;
+    rows.forEach(tr => { const v=parseFloat(tr.querySelectorAll('input')[ci]?.value); if(!isNaN(v)&&v>0){t+=v;h=true;} });
+    return {t,h};
+  }
+  const nursing=cs(1), eattime=cs(2), pump=cs(3), formula=cs(4);
+  s.el.querySelector('.s-sum-nursing').textContent  = nursing.h  ? nursing.t  + ' \u05d3\u05e7\u05f3' : '\u2014';
+  s.el.querySelector('.s-sum-eattime').textContent  = eattime.h  ? eattime.t  + ' \u05d3\u05e7\u05f3' : '\u2014';
+  s.el.querySelector('.s-sum-pump').textContent     = pump.h     ? pump.t     + ' \u05de\u05f4\u05dc'  : '\u2014';
+  s.el.querySelector('.s-sum-formula').textContent  = formula.h  ? formula.t  + ' \u05de\u05f4\u05dc'  : '\u2014';
+  s.el.querySelector('.s-tfoot').classList.remove('hidden');
+  const mlTotal = (pump.h?pump.t:0)+(formula.h?formula.t:0);
+  const parts=[];
+  if(mlTotal>0)   parts.push(mlTotal+' \u05de\u05f4\u05dc');
+  if(nursing.h)   parts.push(nursing.t+' \u05d3\u05e7\u05f3 \u05d4\u05e0\u05e7\u05d4');
+  if(eattime.h)   parts.push(eattime.t+' \u05d3\u05e7\u05f3 \u05d0\u05db\u05dc');
+  const gEl=s.el.querySelector('.s-grand'), gVal=s.el.querySelector('.s-grand-val');
+  if(parts.length){ gEl.classList.add('visible'); gVal.textContent=parts.join(' \u00b7 '); }
+  else { gEl.classList.remove('visible'); }
+  s.el.querySelector('.s-tfoot').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ══════════════════════════════════════════════
+//  SLEEP ROWS
+// ══════════════════════════════════════════════
+function addSleepRow(sIdx, data) {
+  const s = sleepSessions[sIdx];
+  if (!s) return;
+  globalRowId++;
+  const rid = 'r-' + globalRowId;
+  const tr = document.createElement('tr');
+  tr.id = rid;
+  tr.innerHTML =
+    '<td><input type="time" class="sleep-input" value="'+(data?.start!==undefined?data.start:nowTime())+'"></td>' +
+    '<td><input type="time" class="sleep-input" value="'+(data?.end||'')+'"></td>' +
+    '<td><div class="dur-cell '+(data?.start&&data?.end?'':'empty')+'" id="dur-'+rid+'">' + calcDur(data?.start||'',data?.end||'') + '</div></td>' +
+    '<td><button class="del-btn" data-rid="'+rid+'" data-sidx="'+sIdx+'">\u2715</button></td>';
+  tr.querySelector('.del-btn').addEventListener('click', function(){ deleteSleepRow(this.dataset.rid, +this.dataset.sidx); });
+  // Recalc duration on change
+  const inputs = tr.querySelectorAll('input');
+  inputs.forEach(inp => inp.addEventListener('input', () => {
+    const start=inputs[0].value, end=inputs[1].value;
+    const durEl=document.getElementById('dur-'+rid);
+    const d=calcDur(start,end);
+    durEl.textContent=d; durEl.className='dur-cell'+(d==='\u2014'?' empty':'');
+    scheduleSave();
+  }));
+  s.el.querySelector('.s-tbody').appendChild(tr);
+  s.rowCount++;
+  syncEmpty(s); hideTotals(s);
+  if (!data) inputs[0].focus();
+}
+
+function calcDur(start, end) {
+  if (!start || !end) return '\u2014';
+  const [sh,sm] = start.split(':').map(Number);
+  let   [eh,em] = end.split(':').map(Number);
+  let mins = (eh*60+em) - (sh*60+sm);
+  if (mins < 0) mins += 24*60;  // overnight
+  if (mins === 0) return '\u2014';
+  const h = Math.floor(mins/60), m = mins%60;
+  if (h>0 && m>0) return h+'\u05e9\u05f3'+pad(m)+'\u05d3\u05f3';
+  if (h>0)        return h+' \u05e9\u05e2\u05d5\u05ea';
+  return m+' \u05d3\u05e7\u05f3';
+}
+
+function deleteSleepRow(rid, sIdx) {
+  const tr=document.getElementById(rid); if(!tr) return;
+  tr.style.transition='opacity .17s,transform .17s'; tr.style.opacity='0'; tr.style.transform='translateX(14px)';
+  setTimeout(()=>{ tr.remove(); sleepSessions[sIdx].rowCount--; syncEmpty(sleepSessions[sIdx]); hideTotals(sleepSessions[sIdx]); scheduleSave(); },170);
+}
+
+function newSleepSession() {
+  createSleepSession();
+  const idx=sleepSessions.length-1;
+  sleepActive=idx;
+  sleepSessions.forEach(s=>s.el.classList.remove('active'));
+  sleepSessions[idx].el.classList.add('active');
+  rebuildNavTabs();
+  addSleepRow(idx);
+  saveState();
+}
+
+function clearSleepSession(sIdx) {
+  if(!confirm('\u05dc\u05de\u05d7\u05d5\u05e7 \u05e9\u05d9\u05e0\u05d4 '+(sIdx+1)+'?')) return;
+  sleepSessions[sIdx].el.querySelector('.s-tbody').innerHTML='';
+  sleepSessions[sIdx].rowCount=0;
+  hideTotals(sleepSessions[sIdx]); syncEmpty(sleepSessions[sIdx]); saveState();
+}
+
+function calcSleepSum(sIdx) {
+  const s=sleepSessions[sIdx];
+  const rows=s.el.querySelectorAll('.s-tbody tr');
+  if(!rows.length) return;
+  let totalMins=0, count=0;
+  rows.forEach(tr=>{
+    const inp=tr.querySelectorAll('input');
+    const start=inp[0]?.value, end=inp[1]?.value;
+    if(!start||!end) return;
+    let [sh,sm]=start.split(':').map(Number), [eh,em]=end.split(':').map(Number);
+    let m=(eh*60+em)-(sh*60+sm);
+    if(m<0) m+=24*60;
+    if(m>0){totalMins+=m; count++;}
+  });
+  const h=Math.floor(totalMins/60), m=totalMins%60;
+  let sumText='\u2014';
+  if(count>0) sumText = (h>0?h+'\u05e9\u05f3':'')+pad(m)+'\u05d3\u05f3';
+  // Don't show tfoot for sleep — only show grand total banner
+  const gEl=s.el.querySelector('.s-grand'), gVal=s.el.querySelector('.s-grand-val');
+  if(count>0){
+    gEl.classList.add('visible');
+    gVal.textContent = (h>0?h+' \u05e9\u05e2\u05d5\u05ea ':'')+m+' \u05d3\u05e7\u05f3';
+    gEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else { gEl.classList.remove('visible'); }
+}
+
+// ══════════════════════════════════════════════
+//  SHARED UTILS
+// ══════════════════════════════════════════════
+function syncEmpty(s) {
+  s.el.querySelector('.s-empty').style.display = s.el.querySelectorAll('.s-tbody tr').length ? 'none' : 'block';
+}
+function hideTotals(s) {
   s.el.querySelector('.s-tfoot').classList.add('hidden');
   s.el.querySelector('.s-grand').classList.remove('visible');
 }
 
-// ══════════════════════════════════════════════
-//  CALC SUM
-// ══════════════════════════════════════════════
-function calcSum(sIdx) {
-  const s = sessions[sIdx];
-  const rows = s.el.querySelectorAll('.s-tbody tr');
-  if (!rows.length) return;
-
-  function colSum(ci) {
-    let total = 0, has = false;
-    rows.forEach(tr => {
-      const inp = tr.querySelectorAll('input')[ci];
-      const v = parseFloat(inp ? inp.value : '');
-      if (!isNaN(v) && v > 0) { total += v; has = true; }
-    });
-    return { total, has };
-  }
-
-  const nursing = colSum(1), pump = colSum(2), formula = colSum(3);
-
-  s.el.querySelector('.s-sum-nursing').textContent = nursing.has ? nursing.total + ' \u05d3\u05e7\u05f3' : '\u2014';
-  s.el.querySelector('.s-sum-pump').textContent    = pump.has    ? pump.total    + ' \u05de\u05f4\u05dc' : '\u2014';
-  s.el.querySelector('.s-sum-formula').textContent = formula.has ? formula.total + ' \u05de\u05f4\u05dc' : '\u2014';
-  s.el.querySelector('.s-tfoot').classList.remove('hidden');
-
-  const mlTotal = (pump.has ? pump.total : 0) + (formula.has ? formula.total : 0);
-  const grandEl  = s.el.querySelector('.s-grand');
-  const grandVal = s.el.querySelector('.s-grand-val');
-  const parts = [];
-  if (mlTotal > 0) parts.push(mlTotal + ' \u05de\u05f4\u05dc \u05e1\u05d4\u05f4\u05db');
-  if (nursing.has) parts.push(nursing.total + ' \u05d3\u05e7\u05f3 \u05d4\u05e0\u05e7\u05d4');
-
-  if (parts.length) {
-    grandEl.classList.add('visible');
-    grandVal.textContent = parts.join(' \u00b7 ');
-  } else {
-    grandEl.classList.remove('visible');
-  }
-  s.el.querySelector('.s-tfoot').scrollIntoView({ behavior:'smooth', block:'nearest' });
+function deleteAllSessions() {
+  if(!confirm('\u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05db\u05dc \u05d4\u05de\u05d3\u05d9\u05d3\u05d5\u05ea?')) return;
+  feedSessions.forEach(s=>s.el.remove()); feedSessions=[]; feedActive=0;
+  sleepSessions.forEach(s=>s.el.remove()); sleepSessions=[]; sleepActive=0;
+  globalRowId=0;
+  // Re-create one session for each view
+  const prevView=currentView;
+  currentView='feed';  createFeedSession();  feedSessions[0].el.classList.add('active');  addFeedRow(0);
+  currentView='sleep'; createSleepSession(); sleepSessions[0].el.classList.add('active'); addSleepRow(0);
+  currentView=prevView;
+  rebuildNavTabs();
+  saveState();
 }
 
 // ══════════════════════════════════════════════
-//  INIT — restore from localStorage or fresh
+//  STORAGE
 // ══════════════════════════════════════════════
-function init() {
-  const saved = loadState();
-  if (saved && saved.sessions && saved.sessions.length) {
-    saved.sessions.forEach(sData => {
-      createSession(sData.label);
-      const sIdx = sessions.length - 1;
-      (sData.rows || []).forEach(row => addRow(sIdx, row));
-      syncEmpty(sIdx);
-    });
-    const restoreIdx = Math.min(saved.activeIdx || 0, sessions.length - 1);
-    switchTo(restoreIdx);
-  } else {
-    createSession();
-    switchTo(0);
-    addRow(0);
-  }
+function getFeedRowData(s) {
+  return Array.from(s.el.querySelectorAll('.s-tbody tr')).map(tr=>{
+    const i=tr.querySelectorAll('input');
+    return {time:i[0]?.value||'',nursing:i[1]?.value||'',eattime:i[2]?.value||'',pump:i[3]?.value||'',formula:i[4]?.value||''};
+  });
+}
+function getSleepRowData(s) {
+  return Array.from(s.el.querySelectorAll('.s-tbody tr')).map(tr=>{
+    const i=tr.querySelectorAll('input');
+    return {start:i[0]?.value||'',end:i[1]?.value||''};
+  });
+}
+
+function saveState() {
+  const data = {
+    feedActive, sleepActive, currentView,
+    feed:  feedSessions.map(s=>({label:s.label, rows:getFeedRowData(s)})),
+    sleep: sleepSessions.map(s=>({label:s.label, rows:getSleepRowData(s)}))
+  };
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  flashSaved();
+}
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch(e){ return null; }
+}
+
+let saveTimer=null;
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveState,600); }
+
+let toastTimer=null;
+function flashSaved(){
+  const el=document.getElementById('saved-toast');
+  el.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1300);
 }
 
 // ══════════════════════════════════════════════
 //  PWA INSTALL
 // ══════════════════════════════════════════════
-let deferredInstallPrompt = null;
+let deferredPrompt=null;
+const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+const bannerDismissed=localStorage.getItem('ofri_installed')==='1';
+if(!isStandalone&&!bannerDismissed) document.getElementById('install-banner').classList.add('show');
 
-// Show install banner always (manual instructions shown by default)
-// If running as installed PWA, hide banner entirely
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-if (!isStandalone) {
-  document.getElementById('install-banner').classList.add('show');
-}
-
-// If browser supports beforeinstallprompt, show the one-tap install button instead
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  // Switch to auto-install UI
-  document.getElementById('install-manual').style.display = 'none';
-  document.getElementById('install-auto').style.display   = 'flex';
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  document.getElementById('install-manual').style.display='none';
+  document.getElementById('install-auto').style.display='flex';
   document.getElementById('install-banner').classList.add('show');
 });
-
-const installBtn = document.getElementById('install-btn');
-if (installBtn) {
-  installBtn.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    const result = await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    document.getElementById('install-banner').classList.remove('show');
-  });
-}
-
-document.getElementById('close-banner').addEventListener('click', () => {
+const iBtn=document.getElementById('install-btn');
+if(iBtn) iBtn.addEventListener('click',async()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const r=await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  if(r.outcome==='accepted') localStorage.setItem('ofri_installed','1');
   document.getElementById('install-banner').classList.remove('show');
 });
-document.getElementById('close-banner-manual').addEventListener('click', () => {
+document.getElementById('close-banner').addEventListener('click',()=>document.getElementById('install-banner').classList.remove('show'));
+document.getElementById('close-banner-manual').addEventListener('click',()=>document.getElementById('install-banner').classList.remove('show'));
+window.addEventListener('appinstalled',()=>{
   document.getElementById('install-banner').classList.remove('show');
-});
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').classList.remove('show');
-  deferredInstallPrompt = null;
+  localStorage.setItem('ofri_installed','1'); deferredPrompt=null;
 });
 
 // ══════════════════════════════════════════════
-//  SERVICE WORKER (inline, enables offline + caching)
+//  SERVICE WORKER
 // ══════════════════════════════════════════════
-if ('serviceWorker' in navigator) {
-  const swCode = `
-const CACHE = 'ofri-v1';
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(clients.claim());
-});
-self.addEventListener('fetch', e => {
-  // For navigation requests, serve from cache if available
-  if (e.request.mode === 'navigate') {
-    e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-        const clone = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return resp;
-      }).catch(() => caches.match('/')))
-    );
-    return;
+if('serviceWorker' in navigator){
+  const sw=`const C='ofri-v2';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>{if(e.request.mode==='navigate'){e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{const c=resp.clone();caches.open(C).then(x=>x.put(e.request,c));return resp;})));return;}e.respondWith(fetch(e.request).then(resp=>{if(resp.ok){const c=resp.clone();caches.open(C).then(x=>x.put(e.request,c));}return resp;}).catch(()=>caches.match(e.request)));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'}).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function init() {
+  const saved = loadState();
+  if (saved) {
+    // Restore feeding sessions
+    (saved.feed||[]).forEach(sd=>{
+      createFeedSession(sd.label);
+      const i=feedSessions.length-1;
+      (sd.rows||[]).forEach(r=>addFeedRow(i,r));
+      syncEmpty(feedSessions[i]);
+    });
+    if(!feedSessions.length){ createFeedSession(); addFeedRow(0); }
+    // Restore sleep sessions
+    (saved.sleep||[]).forEach(sd=>{
+      createSleepSession(sd.label);
+      const i=sleepSessions.length-1;
+      (sd.rows||[]).forEach(r=>addSleepRow(i,r));
+      syncEmpty(sleepSessions[i]);
+    });
+    if(!sleepSessions.length){ createSleepSession(); addSleepRow(0); }
+    feedActive  = Math.min(saved.feedActive||0,  feedSessions.length-1);
+    sleepActive = Math.min(saved.sleepActive||0, sleepSessions.length-1);
+    currentView = saved.currentView||'feed';
+  } else {
+    createFeedSession();  addFeedRow(0);
+    createSleepSession(); addSleepRow(0);
   }
-  // For other requests, network first with cache fallback
-  e.respondWith(
-    fetch(e.request).then(resp => {
-      if (resp.ok) {
-        const clone = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-      }
-      return resp;
-    }).catch(() => caches.match(e.request))
-  );
-});
-`;
-  const swBlob = new Blob([swCode], { type: 'application/javascript' });
-  const swURL  = URL.createObjectURL(swBlob);
-  navigator.serviceWorker.register(swURL, { scope: './' }).catch(() => {});
+  feedSessions[feedActive].el.classList.add('active');
+  sleepSessions[sleepActive].el.classList.add('active');
+  switchView(currentView);
 }
 
-// ══════════════════════════════════════════════
-//  START
-// ══════════════════════════════════════════════
 init();
 </script>
 </body>

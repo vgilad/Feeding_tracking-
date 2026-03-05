@@ -450,7 +450,7 @@ function calcFeedSum(sIdx) {
   const parts=[];
   if(mlTotal>0)   parts.push(mlTotal+' \u05de\u05f4\u05dc');
   if(nursing.h)   parts.push(nursing.t+' \u05d3\u05e7\u05f3 \u05d4\u05e0\u05e7\u05d4');
-  if(eattime.h)   parts.push(eattime.t+' \u05d3\u05e7\u05f3 \u05d0\u05db\u05dc');
+  if(eattime.h)   parts.push(eattime.t+' \u05d3\u05e7\u05f3 \u05d4\u05d0\u05db\u05dc\u05d4');
   const gEl=s.el.querySelector('.s-grand'), gVal=s.el.querySelector('.s-grand-val');
   if(parts.length){ gEl.classList.add('visible'); gVal.textContent=parts.join(' \u00b7 '); }
   else { gEl.classList.remove('visible'); }
@@ -607,7 +607,7 @@ function loadState() {
 }
 
 let saveTimer=null;
-function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveState,600); }
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveState,300); }
 
 let toastTimer=null;
 function flashSaved(){

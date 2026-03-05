@@ -485,7 +485,7 @@ function addSleepRow(sIdx, data) {
   s.el.querySelector('.s-tbody').appendChild(tr);
   s.rowCount++;
   syncEmpty(s); hideTotals(s);
-  if (!data) inputs[0].focus();
+  if (!data) { inputs[0].focus(); scheduleSave(); }
 }
 
 function calcDur(start, end) {
